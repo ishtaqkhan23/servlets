@@ -1,0 +1,14 @@
+<web-app>
+
+    <servlet>
+        <servlet-name>DashboardServlet</servlet-name>
+        <servlet-class>DashboardServlet</servlet-class>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>DashboardServlet</servlet-name>
+        <url-pattern>/dashboard</url-pattern>
+    </servlet-mapping>
+
+</web-app>
