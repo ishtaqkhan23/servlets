@@ -1,9 +1,12 @@
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,8 +14,18 @@ import java.util.Date;
 import java.util.Random;
 
 public class RegistrationServlet extends HttpServlet {
+
+    ServletConfig servletConfig;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        this.servletConfig = config;
+    }
+
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+
 
         Employee employee= new Employee();
         employee.setName(req.getParameter("name"));
@@ -34,6 +47,19 @@ public class RegistrationServlet extends HttpServlet {
         System.out.println(employee);
 
         saveNewEmployee(employee);
+
+        storeDetailsInContext(employee);
+
+        resp.setContentType("text/html");
+        PrintWriter printWriter = resp.getWriter();
+        printWriter.println("Thank You! You are successfully registered.");
+        printWriter.println("<a href=\"details\">Click here to see your details</a>");
+    }
+
+    private void storeDetailsInContext(Employee employee) {
+        ServletContext context = servletConfig.getServletContext();
+        context.setAttribute("name", employee.getName());
+        context.setAttribute("city", employee.getCity());
     }
 
     private void saveNewEmployee(Employee employee) {
@@ -42,8 +68,13 @@ public class RegistrationServlet extends HttpServlet {
             Class.forName("com.mysql.jdbc.Driver");
 
             //step2: establish a connection by providing connection url, username and password.
+            String schemaName = servletConfig.getInitParameter("schema");
+            String userName =  servletConfig.getInitParameter("username");
+            String password =  servletConfig.getInitParameter("password");
+            System.out.println("Schema name = " + schemaName+ " ,username = "+ userName + " and password = "+password );
+
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/mycompany", "root", "root");
+                    "jdbc:mysql://localhost:3306/"+schemaName, userName, password);
 
             String insertStmt = "insert into employee values(?,?,?,?,?,?)";
 
